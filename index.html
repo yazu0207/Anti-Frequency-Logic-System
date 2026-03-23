@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>AFLS Tool</title>
+  <title>AFLS</title>
 
-  <!-- フォント追加（任意だけど見た目改善） -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
 
   <style>
@@ -15,7 +14,7 @@
     .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     button{padding:8px 12px;border-radius:6px;border:0;background:#0b72ff;color:#fff;cursor:pointer}
     button.secondary{background:#f0f6ff;color:#0b72ff;border:1px solid #cfe1ff}
-    input[type="text"]{padding:6px;border-radius:6px;border:1px solid #ddd;width:90px}
+    input{padding:6px;border-radius:6px;border:1px solid #ddd}
     table{width:100%;border-collapse:collapse;margin-top:10px}
     th,td{border:1px solid #eef3ff;padding:6px;text-align:center;font-size:13px}
     .badge{display:inline-block;padding:4px 8px;border-radius:12px;font-weight:700;font-size:12px}
@@ -36,9 +35,36 @@
 </head>
 
 <body>
+
 <h1>Anti-Frequency Logic System</h1>
 
-<!-- 中身はそのままでOK -->
-<script src="./main.js"></script>
+<div class="section">
+  <div>① CSV読み込み</div>
+  <input id="csvFile" type="file">
+  <button id="btnLoadCsv">読み込み</button>
+  <div id="csvInfo">未読込</div>
+</div>
+
+<div class="section">
+  <div>② 範囲</div>
+  <input id="manualRange" value="30">
+  <span id="currentRange">30</span>
+</div>
+
+<div class="section">
+  <button id="btnGenM">M生成</button>
+  <button id="btnCompare">照合</button>
+</div>
+
+<div class="section">
+  <div id="resultArea"></div>
+</div>
+
+<div class="section">
+  <div id="log" class="log"></div>
+</div>
+
+<script src="main.js"></script>
+
 </body>
 </html>
