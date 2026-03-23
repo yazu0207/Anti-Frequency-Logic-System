@@ -11,8 +11,9 @@ function log(msg){
   logBox.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n` + logBox.textContent;
 }
 
-// ---- 初期化 ----
+// ---- Worker ----
 worker.postMessage({cmd:'init'});
+
 worker.onmessage = e=>{
   if(e.data.type==='evaluated'){
     render(e.data.payload);
@@ -20,25 +21,30 @@ worker.onmessage = e=>{
   }
 };
 
-// ---- 手入力UI生成（5行固定）----
+// ---- 手入力UI（5行固定）----
 const manualArea = document.getElementById('manualArea');
+
 for(let r=0;r<5;r++){
   const row = document.createElement('div');
+
   for(let i=0;i<7;i++){
     const input = document.createElement('input');
     input.className = 'manual';
     row.appendChild(input);
   }
+
   manualArea.appendChild(row);
 }
 
-// ---- 共通バリデーション（最重要）----
+// ---- バリデーション ----
 function validateSets(sets){
 
-  if(sets.length !== 5){
-    alert("5行必要です");
+  if(sets.length < 5){
+    alert("5行以上必要です");
     return false;
   }
+
+  sets = sets.slice(0,5);
 
   let all = [];
 
@@ -53,7 +59,7 @@ function validateSets(sets){
   const unique = new Set(all);
 
   if(unique.size !== 35){
-    alert("35個ユニークになっていません（重複あり）");
+    alert("35個ユニークになっていません");
     return false;
   }
 
@@ -68,52 +74,93 @@ function getManual(){
 
   for(let i=0;i<5;i++){
     const row = [];
+
     for(let j=0;j<7;j++){
       const v = Number(inputs[i*7+j].value);
       if(isNaN(v)) return [];
       row.push(v);
     }
+
     sets.push(row.sort((a,b)=>a-b));
   }
 
   return validateSets(sets) ? sets : [];
 }
 
-// ---- CSV（候補）----
+// ---- 候補CSV ----
 document.getElementById('btnLoadCandidate').onclick = ()=>{
+
   const f = document.getElementById('candidateCsv').files[0];
+  if(!f){ alert("CSV選択"); return; }
+
   const r = new FileReader();
 
   r.onload = e=>{
-    const lines = e.target.result.split(/\n/);
-    const sets = [];
+
+    const lines = e.target.result.split(/\r?\n/);
+    let sets = [];
 
     for(const l of lines){
-      const nums = l.split(',').map(n=>Number(n)).filter(n=>!isNaN(n));
-      if(nums.length===7) sets.push(nums.sort((a,b)=>a-b));
+
+      if(!l.trim()) continue;
+
+      const nums = l
+        .split(',')
+        .map(v => v.trim())
+        .map(v => Number(v))
+        .filter(v => !isNaN(v));
+
+      if(nums.length === 7){
+        sets.push(nums.sort((a,b)=>a-b));
+      }
     }
+
+    log("CSV解析行数："+sets.length);
+
+    if(sets.length < 5){
+      alert("5行以上必要です");
+      return;
+    }
+
+    sets = sets.slice(0,5);
 
     if(validateSets(sets)){
       candidateFromCsv = sets;
-      log("候補CSV OK");
+      log("候補CSV読込OK");
+      console.log(sets);
     }
   };
 
   r.readAsText(f);
 };
 
-// ---- CSV（過去）----
+// ---- 過去CSV ----
 document.getElementById('btnLoadCsv').onclick = ()=>{
+
   const f = document.getElementById('csvFile').files[0];
+  if(!f){ alert("CSV選択"); return; }
+
   const r = new FileReader();
 
   r.onload = e=>{
-    const lines = e.target.result.split(/\n/);
+
+    const lines = e.target.result.split(/\r?\n/);
     pastData = [];
 
     for(const l of lines){
-      const nums = l.split(',').slice(-7).map(n=>Number(n)).filter(n=>!isNaN(n));
-      if(nums.length===7) pastData.push(nums);
+
+      if(!l.trim()) continue;
+
+      const nums = l
+        .split(',')
+        .slice(-7)
+        .map(v => v.trim())
+        .map(v => Number(v))
+        .filter(v => !isNaN(v));
+
+      if(nums.length === 7){
+        pastData.push(nums);
+      }
     }
 
     worker.postMessage({cmd:'setPastData',payload:pastData});
@@ -123,12 +170,14 @@ document.getElementById('btnLoadCsv').onclick = ()=>{
   r.readAsText(f);
 };
 
-// ---- 自動生成（35ユニーク保証）----
+// ---- 自動生成 ----
 function generate(){
+
   const nums = [...Array(37)].map((_,i)=>i+1);
 
   while(true){
-    const shuffled = nums.sort(()=>Math.random()-0.5);
+
+    const shuffled = [...nums].sort(()=>Math.random()-0.5);
     const sets = [];
 
     for(let i=0;i<5;i++){
@@ -137,7 +186,7 @@ function generate(){
 
     if(validateSets(sets)){
       lastGenerated = sets;
-      return sets;
+      return;
     }
   }
 }
@@ -183,7 +232,8 @@ document.getElementById('btnCompare').onclick = ()=>{
 
 // ---- 表示 ----
 function render(res){
-  let html="<table><tr><th>No</th><th>数字</th><th>直近</th><th>全体</th></tr>";
+
+  let html="<table><tr><th>No</th><th>数字</th><th>直近一致</th><th>全一致</th></tr>";
 
   res.forEach(r=>{
     html+=`<tr>
