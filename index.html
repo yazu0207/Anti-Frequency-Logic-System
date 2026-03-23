@@ -1,67 +1,57 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>AFLS</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AFLS Tool</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
 
-  <style>
-    body{font-family:"Noto Sans JP",Arial;max-width:1150px;margin:14px auto;padding:12px;color:#222}
-    h1{font-size:20px}
-    .section{background:#fff;border:1px solid #e6eefc;padding:12px;margin:10px 0;border-radius:8px}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    button{padding:8px 12px;border-radius:6px;border:0;background:#0b72ff;color:#fff;cursor:pointer}
-    button.secondary{background:#f0f6ff;color:#0b72ff;border:1px solid #cfe1ff}
-    input{padding:6px;border-radius:6px;border:1px solid #ddd}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{border:1px solid #eef3ff;padding:6px;text-align:center;font-size:13px}
-    .badge{display:inline-block;padding:4px 8px;border-radius:12px;font-weight:700;font-size:12px}
-    .S{background:#d7f6df;color:#0b662b}
-    .A{background:#f0f9e5;color:#2e7d32}
-    .B{background:#fff6d6;color:#9b6a00}
-    .C{background:#fff1e6;color:#a64a00}
-    .D{background:#ffe6e6;color:#a10000}
-    .NG{background:#f8d7da;color:#721c24}
-    .small{font-size:12px;color:#666}
-    .log{background:#111;color:#0f0;padding:8px;border-radius:6px;max-height:160px;overflow:auto;font-family:monospace;font-size:12px}
-
-    @media(max-width:720px){
-      .row{flex-direction:column;align-items:stretch}
-      table{font-size:12px}
-    }
-  </style>
+<style>
+body{font-family:"Noto Sans JP",Arial;max-width:1000px;margin:auto;padding:12px}
+.section{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:8px}
+button{padding:8px 12px;margin:4px;border-radius:6px;border:0;background:#0b72ff;color:#fff}
+select,input{padding:6px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td,th{border:1px solid #ddd;padding:6px;text-align:center}
+.log{background:#000;color:#0f0;height:120px;overflow:auto;font-size:12px;padding:6px}
+</style>
 </head>
 
 <body>
 
-<h1>Anti-Frequency Logic System</h1>
+<h2>Anti-Frequency Logic System</h2>
 
 <div class="section">
-  <div>① CSV読み込み</div>
-  <input id="csvFile" type="file">
-  <button id="btnLoadCsv">読み込み</button>
-  <div id="csvInfo">未読込</div>
+CSV：
+<input type="file" id="csvFile">
+<button id="btnLoadCsv">読込</button>
+<div id="csvInfo">未読込</div>
 </div>
 
 <div class="section">
-  <div>② 範囲</div>
-  <input id="manualRange" value="30">
-  <span id="currentRange">30</span>
+比較範囲：
+<select id="manualRange">
+  <option value="30">30回</option>
+  <option value="50">50回</option>
+  <option value="100">100回</option>
+  <option value="all">全履歴</option>
+</select>
 </div>
 
 <div class="section">
-  <button id="btnGenM">M生成</button>
-  <button id="btnCompare">照合</button>
+<button id="btnGenM">M生成</button>
+<button id="btnCompare">照合</button>
 </div>
 
 <div class="section">
-  <div id="resultArea"></div>
+<h3>結果</h3>
+<div id="resultArea"></div>
 </div>
 
 <div class="section">
-  <div id="log" class="log"></div>
+ログ
+<div id="log" class="log"></div>
 </div>
 
 <script src="main.js"></script>
