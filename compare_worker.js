@@ -19,12 +19,11 @@ self.onmessage = function(e){
 
 function evaluate(candidates,range){
 
-  const past = pastData;
-  const fullSets = past.map(r=>new Set(r));
+  const fullSets = pastData.map(r=>new Set(r));
 
-  let recent = past;
+  let recent = pastData;
   if(range!=='all'){
-    recent = past.slice(-Number(range));
+    recent = pastData.slice(-Number(range));
   }
 
   const recentSets = recent.map(r=>new Set(r));
